@@ -1,0 +1,7 @@
+.texto-resumo {
+  white-space: pre-line;
+}
+
+.experiencia:not(:last-child) {
+  border-bottom: 1px solid var(--bs-border-color);
+}

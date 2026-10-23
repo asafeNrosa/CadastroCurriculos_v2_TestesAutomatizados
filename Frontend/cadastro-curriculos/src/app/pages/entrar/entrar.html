@@ -1,0 +1,104 @@
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-5">
+
+    <h1 class="h3 mb-3">{{ modo() === 'entrar' ? 'Entrar' : 'Criar conta' }}</h1>
+    <p class="text-body-secondary small mb-4">
+      Com uma conta você pode editar ou excluir o seu próprio currículo.
+      Cadastrar um currículo continua possível sem conta.
+    </p>
+
+    <ul class="nav nav-tabs mb-3" role="tablist">
+      <li class="nav-item">
+        <button type="button" class="nav-link" [class.active]="modo() === 'entrar'"
+                role="tab" [attr.aria-selected]="modo() === 'entrar'" (click)="alternarModo('entrar')">
+          Entrar
+        </button>
+      </li>
+      <li class="nav-item">
+        <button type="button" class="nav-link" [class.active]="modo() === 'criar'"
+                role="tab" [attr.aria-selected]="modo() === 'criar'" (click)="alternarModo('criar')">
+          Criar conta
+        </button>
+      </li>
+    </ul>
+
+    @if (modo() === 'entrar') {
+      <form class="card shadow-sm" [formGroup]="formEntrar" (ngSubmit)="entrar()" novalidate>
+        <div class="card-body p-4">
+          <div class="mb-3">
+            <label for="entrar-email" class="form-label">E-mail</label>
+            <input id="entrar-email" type="email" class="form-control" formControlName="email"
+                   autocomplete="username" [class.is-invalid]="erroDeEmail(formEntrar.controls.email)">
+            <div class="invalid-feedback">{{ erroDeEmail(formEntrar.controls.email) }}</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="entrar-senha" class="form-label">Senha</label>
+            <input id="entrar-senha" type="password" class="form-control" formControlName="senha"
+                   autocomplete="current-password"
+                   [class.is-invalid]="formEntrar.controls.senha.touched && formEntrar.controls.senha.invalid">
+            <div class="invalid-feedback">A senha é obrigatória.</div>
+          </div>
+
+          @if (erro(); as texto) {
+            <div class="alert alert-danger" role="alert">{{ texto }}</div>
+          }
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary" [disabled]="enviando()">
+              @if (enviando()) {
+                <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Entrando...
+              } @else {
+                Entrar
+              }
+            </button>
+          </div>
+        </div>
+      </form>
+    } @else {
+      <form class="card shadow-sm" [formGroup]="formCriar" (ngSubmit)="criarConta()" novalidate>
+        <div class="card-body p-4">
+          <div class="mb-3">
+            <label for="criar-email" class="form-label">E-mail</label>
+            <input id="criar-email" type="email" class="form-control" formControlName="email"
+                   autocomplete="username" [class.is-invalid]="erroDeEmail(formCriar.controls.email)">
+            <div class="invalid-feedback">{{ erroDeEmail(formCriar.controls.email) }}</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="criar-senha" class="form-label">Senha</label>
+            <input id="criar-senha" type="password" class="form-control" formControlName="senha"
+                   autocomplete="new-password" [class.is-invalid]="erroDeSenha()">
+            <div class="form-text">Mínimo de 8 caracteres.</div>
+            <div class="invalid-feedback">{{ erroDeSenha() }}</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="criar-confirmar" class="form-label">Confirmar senha</label>
+            <input id="criar-confirmar" type="password" class="form-control" formControlName="confirmarSenha"
+                   autocomplete="new-password" [class.is-invalid]="erroDeConfirmacao()">
+            <div class="invalid-feedback">{{ erroDeConfirmacao() }}</div>
+          </div>
+
+          @if (erro(); as texto) {
+            <div class="alert alert-danger" role="alert">{{ texto }}</div>
+          }
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary" [disabled]="enviando()">
+              @if (enviando()) {
+                <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Criando conta...
+              } @else {
+                Criar conta
+              }
+            </button>
+          </div>
+        </div>
+      </form>
+    }
+
+    <p class="text-center small mt-3 mb-0">
+      <a routerLink="/candidatos/novo">Continuar sem conta e cadastrar um currículo</a>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,150 @@
+﻿@baseUrl = http://localhost:5006
+
+### Listar candidatos
+GET {{baseUrl}}/api/candidatos
+
+### Cadastrar válido, sem login (esperado: 201)
+POST {{baseUrl}}/api/candidatos
+Content-Type: application/json
+
+{
+  "nomeCompleto": "Maria da Silva",
+  "email": "maria.silva@exemplo.com",
+  "telefone": "(41) 99999-0000",
+  "areaInteresse": "Desenvolvimento Backend",
+  "resumoProfissional": "Desenvolvedora com experiência em .NET.",
+  "experiencias": [
+    {
+      "empresa": "Acme Tecnologia",
+      "cargo": "Desenvolvedora Júnior",
+      "dataInicio": "2023-02-01",
+      "dataFim": "2024-06-30",
+      "descricao": "APIs REST em ASP.NET Core."
+    },
+    {
+      "empresa": "Beta Sistemas",
+      "cargo": "Desenvolvedora Pleno",
+      "dataInicio": "2024-07-01",
+      "dataFim": null
+    }
+  ]
+}
+
+### Repetir o cadastro acima (esperado: 409)
+
+### Cadastro inválido (esperado: 400)
+POST {{baseUrl}}/api/candidatos
+Content-Type: application/json
+
+{
+  "nomeCompleto": "   ",
+  "email": "email-invalido"
+}
+
+### Experiência inválida: sem empresa e término antes do início (esperado: 400)
+POST {{baseUrl}}/api/candidatos
+Content-Type: application/json
+
+{
+  "nomeCompleto": "Pedro Souza",
+  "email": "pedro.souza@exemplo.com",
+  "experiencias": [
+    { "empresa": "", "cargo": "Dev", "dataInicio": "2024-05-01", "dataFim": "2024-01-01" }
+  ]
+}
+
+### Detalhes (esperado: 200)
+GET {{baseUrl}}/api/candidatos/1
+
+### Id inexistente (esperado: 404)
+GET {{baseUrl}}/api/candidatos/9999
+
+### ---------- Autenticação ----------
+
+### Criar conta (esperado: 201 com token)
+# @name registrar
+POST {{baseUrl}}/api/auth/registrar
+Content-Type: application/json
+
+{
+  "email": "ana.lima@exemplo.com",
+  "senha": "senha-segura-123"
+}
+
+### Entrar (esperado: 200 com token)
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "ana.lima@exemplo.com",
+  "senha": "senha-segura-123"
+}
+
+@token = {{login.response.body.$.token}}
+
+### Senha errada (esperado: 401)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "ana.lima@exemplo.com",
+  "senha": "senha-errada"
+}
+
+### ---------- Currículo do usuário logado ----------
+
+### Cadastrar logado: o currículo passa a ser da Ana (esperado: 201)
+# @name cadastroLogado
+POST {{baseUrl}}/api/candidatos
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nomeCompleto": "Ana Lima",
+  "email": "ana.lima@exemplo.com",
+  "experiencias": [
+    { "empresa": "Acme Tecnologia", "cargo": "Estagiária", "dataInicio": "2024-01-10" }
+  ]
+}
+
+@candidatoId = {{cadastroLogado.response.body.$.id}}
+
+### Meu currículo (esperado: 200)
+GET {{baseUrl}}/api/candidatos/meu
+Authorization: Bearer {{token}}
+
+### Editar o próprio currículo (esperado: 200)
+PUT {{baseUrl}}/api/candidatos/{{candidatoId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nomeCompleto": "Ana Lima Souza",
+  "email": "ana.lima@exemplo.com",
+  "areaInteresse": "Backend .NET",
+  "experiencias": [
+    { "empresa": "Acme Tecnologia", "cargo": "Desenvolvedora Júnior", "dataInicio": "2024-01-10" }
+  ]
+}
+
+### Editar sem token (esperado: 401)
+PUT {{baseUrl}}/api/candidatos/{{candidatoId}}
+Content-Type: application/json
+
+{ "nomeCompleto": "Qualquer", "email": "qualquer@exemplo.com" }
+
+### Editar o currículo de outra pessoa, o anônimo da Maria (esperado: 403)
+PUT {{baseUrl}}/api/candidatos/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "nomeCompleto": "Invasor", "email": "invasor@exemplo.com" }
+
+### Excluir o próprio currículo (esperado: 204)
+DELETE {{baseUrl}}/api/candidatos/{{candidatoId}}
+Authorization: Bearer {{token}}
+
+### Excluir de novo (esperado: 404)
+DELETE {{baseUrl}}/api/candidatos/{{candidatoId}}
+Authorization: Bearer {{token}}

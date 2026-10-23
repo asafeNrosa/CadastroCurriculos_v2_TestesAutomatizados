@@ -1,0 +1,22 @@
+<nav class="navbar navbar-expand bg-primary" data-bs-theme="dark">
+  <div class="container flex-wrap gap-2">
+    <a class="navbar-brand fw-semibold" routerLink="/">Cadastro de Currículos</a>
+    <div class="navbar-nav flex-wrap align-items-center">
+      <a class="nav-link" routerLink="/candidatos/novo" routerLinkActive="active">Cadastrar</a>
+      <a class="nav-link" routerLink="/candidatos" routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }">Candidatos</a>
+
+      @if (auth.logado()) {
+        <span class="navbar-text small ms-lg-3" data-testid="usuario-logado">{{ auth.email() }}</span>
+        <button type="button" class="btn btn-link nav-link" (click)="abrirMeuCurriculo()">Meu currículo</button>
+        <button type="button" class="btn btn-link nav-link" (click)="sair()">Sair</button>
+      } @else {
+        <a class="nav-link" routerLink="/entrar" routerLinkActive="active">Entrar</a>
+      }
+    </div>
+  </div>
+</nav>
+
+<main class="container py-4">
+  <router-outlet />
+</main>

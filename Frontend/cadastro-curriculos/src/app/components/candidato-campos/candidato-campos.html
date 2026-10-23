@@ -1,0 +1,120 @@
+<div [formGroup]="form()">
+
+  <div class="mb-3">
+    <label for="nomeCompleto" class="form-label">Nome completo <span class="text-danger">*</span></label>
+    <input id="nomeCompleto" class="form-control" formControlName="nomeCompleto"
+           maxlength="150" autocomplete="name"
+           [class.is-invalid]="erroDe('nomeCompleto')"
+           [class.campo-pdf]="destaques().has('nomeCompleto')"
+           (input)="campoEditado.emit('nomeCompleto')">
+    <div class="invalid-feedback">{{ erroDe('nomeCompleto') }}</div>
+  </div>
+
+  <div class="mb-3">
+    <label for="email" class="form-label">E-mail <span class="text-danger">*</span></label>
+    <input id="email" type="email" class="form-control" formControlName="email"
+           maxlength="254" autocomplete="email"
+           [class.is-invalid]="erroDe('email')"
+           [class.campo-pdf]="destaques().has('email')"
+           (input)="campoEditado.emit('email')">
+    <div class="invalid-feedback">{{ erroDe('email') }}</div>
+  </div>
+
+  <div class="mb-3">
+    <label for="telefone" class="form-label">Telefone</label>
+    <input id="telefone" type="tel" class="form-control" formControlName="telefone"
+           maxlength="20" autocomplete="tel" placeholder="(41) 99999-0000"
+           [class.is-invalid]="erroDe('telefone')"
+           [class.campo-pdf]="destaques().has('telefone')"
+           (input)="campoEditado.emit('telefone')">
+    <div class="invalid-feedback">{{ erroDe('telefone') }}</div>
+  </div>
+
+  <div class="mb-3">
+    <label for="areaInteresse" class="form-label">Área ou cargo de interesse</label>
+    <input id="areaInteresse" class="form-control" formControlName="areaInteresse"
+           maxlength="100" [class.is-invalid]="erroDe('areaInteresse')"
+           [class.campo-pdf]="destaques().has('areaInteresse')"
+           (input)="campoEditado.emit('areaInteresse')">
+    <div class="invalid-feedback">{{ erroDe('areaInteresse') }}</div>
+  </div>
+
+  <div class="mb-3">
+    <label for="resumoProfissional" class="form-label">Resumo profissional</label>
+    <textarea id="resumoProfissional" class="form-control" rows="5"
+              formControlName="resumoProfissional" maxlength="2000"
+              [class.is-invalid]="erroDe('resumoProfissional')"
+              [class.campo-pdf]="destaques().has('resumoProfissional')"
+              (input)="campoEditado.emit('resumoProfissional')"></textarea>
+    <div class="invalid-feedback">{{ erroDe('resumoProfissional') }}</div>
+  </div>
+
+  <section class="mb-3" aria-labelledby="titulo-experiencias">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+      <h2 id="titulo-experiencias" class="h5 mb-0">Experiência profissional</h2>
+      <button type="button" class="btn btn-outline-primary btn-sm"
+              [disabled]="experiencias.length >= limite" (click)="adicionarExperiencia()">
+        Adicionar experiência
+      </button>
+    </div>
+
+    @if (experiencias.length === 0) {
+      <p class="text-body-secondary small mb-0">
+        Nenhuma experiência adicionada. Use o botão acima para incluir quantas precisar (até {{ limite }}).
+      </p>
+    }
+
+    @for (grupo of experiencias.controls; track grupo; let i = $index) {
+      <div class="card mb-3" [formGroup]="grupo" [attr.data-testid]="'experiencia-' + i">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h3 class="h6 mb-0">Experiência {{ i + 1 }}</h3>
+            <button type="button" class="btn btn-outline-danger btn-sm"
+                    [attr.aria-label]="'Remover experiência ' + (i + 1)"
+                    (click)="removerExperiencia(i)">Remover</button>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label [attr.for]="'experiencia-' + i + '-empresa'" class="form-label">Empresa <span class="text-danger">*</span></label>
+              <input [id]="'experiencia-' + i + '-empresa'" class="form-control" formControlName="empresa" maxlength="150"
+                     [class.is-invalid]="erroDaExperiencia(grupo, 'empresa')">
+              <div class="invalid-feedback">{{ erroDaExperiencia(grupo, 'empresa') }}</div>
+            </div>
+
+            <div class="col-md-6">
+              <label [attr.for]="'experiencia-' + i + '-cargo'" class="form-label">Cargo <span class="text-danger">*</span></label>
+              <input [id]="'experiencia-' + i + '-cargo'" class="form-control" formControlName="cargo" maxlength="100"
+                     [class.is-invalid]="erroDaExperiencia(grupo, 'cargo')">
+              <div class="invalid-feedback">{{ erroDaExperiencia(grupo, 'cargo') }}</div>
+            </div>
+
+            <div class="col-md-6">
+              <label [attr.for]="'experiencia-' + i + '-inicio'" class="form-label">Início <span class="text-danger">*</span></label>
+              <input [id]="'experiencia-' + i + '-inicio'" type="date" class="form-control" formControlName="dataInicio"
+                     [class.is-invalid]="erroDaExperiencia(grupo, 'dataInicio')">
+              <div class="invalid-feedback">{{ erroDaExperiencia(grupo, 'dataInicio') }}</div>
+            </div>
+
+            <div class="col-md-6">
+              <label [attr.for]="'experiencia-' + i + '-fim'" class="form-label">Término</label>
+              <input [id]="'experiencia-' + i + '-fim'" type="date" class="form-control" formControlName="dataFim"
+                     [class.is-invalid]="erroDaExperiencia(grupo, 'dataFim')">
+              <div class="form-text">Deixe em branco se for o emprego atual.</div>
+              <div class="invalid-feedback">{{ erroDaExperiencia(grupo, 'dataFim') }}</div>
+            </div>
+
+            <div class="col-12">
+              <label [attr.for]="'experiencia-' + i + '-descricao'" class="form-label">Descrição</label>
+              <textarea [id]="'experiencia-' + i + '-descricao'" class="form-control" rows="3"
+                        formControlName="descricao" maxlength="1000"
+                        [class.is-invalid]="erroDaExperiencia(grupo, 'descricao')"></textarea>
+              <div class="invalid-feedback">{{ erroDaExperiencia(grupo, 'descricao') }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </section>
+
+</div>

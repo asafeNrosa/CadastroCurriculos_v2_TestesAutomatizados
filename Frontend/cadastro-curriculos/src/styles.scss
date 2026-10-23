@@ -1,0 +1,24 @@
+$primary: #6D28D9;
+$info: #0E7490;
+$success: #15803D;
+$danger: #B91C1C;
+$warning: #B45309;
+$body-bg: #F5F3FF;
+$body-color: #1E1B4B;
+$input-border-color: #C4B5FD;
+$input-focus-border-color: #7C3AED;
+$body-secondary-color: #4B5563;
+
+@import "bootstrap/scss/bootstrap";
+
+:root {
+  --cor-foco: #7C3AED;
+  --cor-texto-secundario: #4B5563;
+  --cor-pdf: #0E7490;
+  --cor-pdf-fundo: #ECFEFF;
+}
+
+.campo-pdf {
+  border-color: var(--cor-pdf);
+  background-color: var(--cor-pdf-fundo);
+}

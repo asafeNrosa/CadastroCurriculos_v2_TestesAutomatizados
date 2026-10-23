@@ -1,0 +1,122 @@
+@if (carregando()) {
+  <div class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+  </div>
+} @else if (erro()) {
+  <div class="alert alert-danger" role="alert">{{ erro() }}</div>
+  <a class="btn btn-outline-primary" routerLink="/candidatos">Voltar para a lista</a>
+} @else if (candidato(); as c) {
+  @if (mensagem(); as msg) {
+    <div class="alert alert-{{ msg.tipo }}" role="status">{{ msg.texto }}</div>
+  }
+
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+      <p class="text-body-secondary small mb-1">{{ editando() ? 'Editando cadastro' : 'Detalhes do candidato' }}</p>
+      <h1 class="h3 mb-0">{{ c.nomeCompleto }}</h1>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+      @if (c.podeEditar && !editando()) {
+        <button type="button" class="btn btn-primary" (click)="iniciarEdicao()">Editar</button>
+        <button type="button" class="btn btn-outline-danger" (click)="pedirExclusao()"
+                [disabled]="confirmandoExclusao()">Excluir</button>
+      }
+      <a class="btn btn-outline-primary" routerLink="/candidatos">Voltar para a lista</a>
+    </div>
+  </div>
+
+  @if (confirmandoExclusao()) {
+    <div class="alert alert-danger" role="alertdialog" aria-labelledby="titulo-exclusao">
+      <p id="titulo-exclusao" class="fw-semibold mb-1">Excluir este cadastro?</p>
+      <p class="mb-3">Os dados e as experiências profissionais serão apagados e não podem ser recuperados.</p>
+      <div class="d-flex flex-wrap gap-2">
+        <button type="button" class="btn btn-danger" (click)="confirmarExclusao()" [disabled]="excluindo()">
+          @if (excluindo()) {
+            <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Excluindo...
+          } @else {
+            Confirmar exclusão
+          }
+        </button>
+        <button type="button" class="btn btn-outline-secondary" (click)="cancelarExclusao()" [disabled]="excluindo()">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (editando()) {
+    <form class="card shadow-sm" [formGroup]="form" (ngSubmit)="salvarEdicao()" novalidate>
+      <div class="card-body p-4">
+        <app-candidato-campos [form]="form" />
+
+        @if (mensagemEdicao(); as texto) {
+          <div class="alert alert-danger mb-3" role="alert">{{ texto }}</div>
+        }
+
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-outline-primary" (click)="cancelarEdicao()" [disabled]="salvando()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="salvando()">
+            @if (salvando()) {
+              <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Salvando...
+            } @else {
+              Salvar alterações
+            }
+          </button>
+        </div>
+      </div>
+    </form>
+  } @else {
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Nome completo</dt>
+          <dd class="col-sm-8">{{ c.nomeCompleto }}</dd>
+
+          <dt class="col-sm-4">E-mail</dt>
+          <dd class="col-sm-8"><a [href]="'mailto:' + c.email">{{ c.email }}</a></dd>
+
+          <dt class="col-sm-4">Telefone</dt>
+          <dd class="col-sm-8">{{ c.telefone ?? 'Não informado' }}</dd>
+
+          <dt class="col-sm-4">Área ou cargo de interesse</dt>
+          <dd class="col-sm-8">{{ c.areaInteresse ?? 'Não informado' }}</dd>
+
+          <dt class="col-sm-4">Data de cadastro</dt>
+          <dd class="col-sm-8">{{ c.dataCadastro | date: 'dd/MM/yyyy HH:mm' }}</dd>
+
+          <dt class="col-12 mt-2">Resumo profissional</dt>
+          <dd class="col-12 mb-0 texto-resumo">{{ c.resumoProfissional ?? 'Não informado' }}</dd>
+        </dl>
+      </div>
+    </div>
+
+    <section class="card shadow-sm mt-4" aria-labelledby="titulo-experiencias">
+      <div class="card-body p-4">
+        <h2 id="titulo-experiencias" class="h5 mb-3">Experiência profissional</h2>
+
+        @if (c.experiencias.length === 0) {
+          <p class="text-body-secondary mb-0">Nenhuma experiência informada.</p>
+        } @else {
+          <ul class="list-unstyled mb-0">
+            @for (e of c.experiencias; track e.id) {
+              <li class="experiencia pb-3 mb-3">
+                <div class="fw-semibold">{{ e.cargo }} · {{ e.empresa }}</div>
+                <div class="small text-body-secondary">
+                  {{ e.dataInicio | date: 'MM/yyyy' }} – {{ e.dataFim ? (e.dataFim | date: 'MM/yyyy') : 'Atual' }}
+                </div>
+                @if (e.descricao) {
+                  <p class="mb-0 mt-1 texto-resumo">{{ e.descricao }}</p>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </section>
+  }
+}

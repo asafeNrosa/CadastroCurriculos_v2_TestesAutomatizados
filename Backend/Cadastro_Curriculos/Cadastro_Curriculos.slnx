@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Cadastro_Curriculos.Tests/Cadastro_Curriculos.Tests.csproj" Id="d6be6dd3-9d7d-46de-9376-a9561f161080" />
+  <Project Path="Cadastro_Curriculos/Cadastro_Curriculos.csproj" />
+</Solution>
